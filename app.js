@@ -87,35 +87,68 @@ app.get("/send-email", (req, res) => {
 
 app.get("/track", track);
 app;
-app.post("/track", async(req, res) => {
+app.post("/track", async (req, res) => {
   res.status(204).end();
 
- const message = req.body.message;
+  const message = req.body.message;
   console.log({ message });
   const messageId = message.messageId;
   const emailData = Buffer.from(message.data, "base64").toString("utf-8");
 
   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
-	console.log("data:", await fetchEmail(oAuth2Client, JSON.parse(emailData).messageId))
+
+  if (emailData.historyId) {
+    try {
+      const history = await fetchHistory(
+        oAuth2Client,
+        "me",
+        emailData.historyId
+      );
+
+      if (history && history.history && history.history.length > 0) {
+        history.history.forEach(async (historyItem) => {
+          historyItem.messagesAdded.forEach(async (msg) => {
+            const message = await fetchEmail(oAuth2Client, msg.message.id);
+
+            console.log(message);
+          });
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching email:", error);
+    }
+  }
 });
 
-
-async function fetchEmail(auth, messageId) {
-    const gmail = google.gmail({ version: 'v1', auth });
-    try {
-        const response = await gmail.users.messages.get({
-            userId: 'me',
-            id: messageId,
-            format: 'full'  // This fetches the full email body
-        });
-        return response.data;
-    } catch (error) {
-        console.error('The API returned an error: ' + error);
-        throw error;
-    }
+async function fetchHistory(auth, userId, historyId) {
+  const gmail = google.gmail({ version: "v1", auth });
+  try {
+    const response = await gmail.users.history.list({
+      userId: userId,
+      startHistoryId: historyId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to list history:", error);
+    throw error;
+  }
 }
 
+async function fetchEmail(auth, messageId) {
+  const gmail = google.gmail({ version: "v1", auth });
+  try {
+    const response = await gmail.users.messages.get({
+      userId: "me",
+      id: messageId,
+      format: "full",
+    });
+    return response.data;
+  } catch (error) {
+    console.error("The API returned an error: " + error);
+    throw error;
+  }
+}
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
