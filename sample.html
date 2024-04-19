@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        /* Add some basic styling and fallback fonts */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .email-wrapper {
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 20px 0;
+        }
+
+        .email-content {
+            background-color: #ffffff;
+            width: 90%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            text-align: center;
+            background-color: #007BFF;
+            color: #ffffff;
+            padding: 10px 0;
+        }
+
+        .email-body {
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Responsive adjustments */
+        @media only screen and (max-width: 620px) {
+            .email-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <table class="email-wrapper" role="presentation">
+        <tr>
+            <td>
+                <table class="email-content" role="presentation">
+                    <tr>
+                        <td class="email-header">
+                            <strong>Welcome to Our Service!</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-body">
+                            <p>Hello World!</p>
+                            <p>This is a simple, cool, email. That hopes to track you opening the email and also replying.</p>
+                            <p><b>Enjoy your day!</b></p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
