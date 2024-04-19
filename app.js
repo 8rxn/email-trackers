@@ -3,13 +3,13 @@ import { sendMail } from "./mail.js";
 import { track } from "./track.js";
 import { google } from "googleapis";
 import { config } from "dotenv";
-import { json } from "body-parser";
+import bodyparser from "body-parser";
 
 config();
 
 const app = express();
 
-app.use(json());
+app.use(bodyparser.json());
 
 const oAuth2Client = new google.auth.OAuth2(
   process.env.CLIENTID,
@@ -87,17 +87,35 @@ app.get("/send-email", (req, res) => {
 
 app.get("/track", track);
 app;
-app.post("/track", (req, res) => {
+app.post("/track", async(req, res) => {
   res.status(204).end();
 
-  const message = req.body.message;
-  const attributes = message.attributes;
-  const messageId = attributes.messageId;
+ const message = req.body.message;
+  console.log({ message });
+  const messageId = message.messageId;
   const emailData = Buffer.from(message.data, "base64").toString("utf-8");
 
   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
+	console.log("data:", await fetchEmail(oAuth2Client, JSON.parse(emailData).messageId))
 });
+
+
+async function fetchEmail(auth, messageId) {
+    const gmail = google.gmail({ version: 'v1', auth });
+    try {
+        const response = await gmail.users.messages.get({
+            userId: 'me',
+            id: messageId,
+            format: 'full'  // This fetches the full email body
+        });
+        return response.data;
+    } catch (error) {
+        console.error('The API returned an error: ' + error);
+        throw error;
+    }
+}
+
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
