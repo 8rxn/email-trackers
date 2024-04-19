@@ -4,6 +4,7 @@ import { track } from "./track.js";
 import { google } from "googleapis";
 import { config } from "dotenv";
 import bodyparser from "body-parser";
+import mailparser from "mailparser";
 
 config();
 
@@ -109,14 +110,12 @@ app.post("/track", async (req, res) => {
             console.log({ msg });
             const message = await fetchEmail(oAuth2Client, msg.id);
             if (message) {
-              const result = checkEmailReplyAndHeader(details);
-              if (result.isReply && result.hasCustomHeader) {
-                console.log(
-                  `Reply with custom header found: ${result.customHeaderValue}`
-                );
+              const html = extractHtmlContent(message.payload);
+              console.log(html);
+
+              if (html) {
               }
             }
-            console.log(message);
           });
         });
       }
@@ -125,6 +124,25 @@ app.post("/track", async (req, res) => {
     }
   }
 });
+
+function extractHtmlContent(payload) {
+  if (payload.mimeType === "text/html") {
+    return Buffer.from(payload.body.data, "base64").toString("utf8");
+  } else if (payload.parts) {
+    for (const part of payload.parts) {
+      if (part.mimeType === "text/html") {
+        return Buffer.from(part.body.data, "base64").toString("utf8");
+      }
+      if (part.parts) {
+        const html = extractHtmlContent(part);
+        if (html) {
+          findID(html);
+        }
+      }
+    }
+  }
+  return null;
+}
 
 async function fetchHistory(auth, userId, historyId) {
   const gmail = google.gmail({ version: "v1", auth });
@@ -140,37 +158,25 @@ async function fetchHistory(auth, userId, historyId) {
   }
 }
 
-async function handleReplies(email) {
-  if (!email.payload || !email.payload.headers) return;
-
-  const headers = email.payload.headers;
-  const inReplyTo = headers.find((header) => header.name === "In-Reply-To");
-  const references = headers.find((header) => header.name === "References");
-  const customHeader = headers.find(
-    (header) => header.name === "X-Tracking-ID"
-  );
-
-  return {
-    isReply: Boolean(inReplyTo || references),
-    hasCustomHeader: Boolean(customHeader),
-    customHeaderValue: customHeader ? customHeader.value : null,
-  };
-}
-
 async function fetchEmail(auth, messageId) {
   const gmail = google.gmail({ version: "v1", auth });
   try {
     const response = await gmail.users.messages.get({
       userId: "me",
       id: messageId,
-      format: "metadata",
-      metadataHeaders: ["In-Reply-To", "References", "X-Tracking-ID"],
+      format: "full",
     });
     return response.data;
   } catch (error) {
     console.error("The API returned an error: " + error);
     throw error;
   }
+}
+
+async function findID(emailHtml) {
+  const regex = /<img\s+[^>]*src="[^"]*\?id=([^"&]+)/;
+  const match = emailHtml.match(regex);
+  console.log(match ? match[1] : null);
 }
 
 app.listen(3000, () => {
