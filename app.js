@@ -97,19 +97,26 @@ app.post("/track", async (req, res) => {
 
   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
-
-  if (emailData.historyId) {
+const data = JSON.parse(emailData)
+  if (data.historyId) {
     try {
       const history = await fetchHistory(
         oAuth2Client,
         "me",
-        emailData.historyId
+        data.historyId
       );
-
+console.log(history)
       if (history && history.history && history.history.length > 0) {
         history.history.forEach(async (historyItem) => {
-          historyItem.messagesAdded.forEach(async (msg) => {
-            const message = await fetchEmail(oAuth2Client, msg.message.id);
+	console.log(historyItem)
+          historyItem.messages.forEach(async (msg) => {
+console.log({msg})
+            const message = await fetchEmail(oAuth2Client, msg.id);
+		if(message){
+const result = checkEmailReplyAndHeader(details);
+            if (result.isReply && result.hasCustomHeader) {
+                console.log(`Reply with custom header found: ${result.customHeaderValue}`);
+           }
 
             console.log(message);
           });
@@ -135,13 +142,29 @@ async function fetchHistory(auth, userId, historyId) {
   }
 }
 
+async function handleReplies(email){
+if (!email.payload || !email.payload.headers) return;
+
+   const headers = email.payload.headers;
+    const inReplyTo = headers.find(header => header.name === 'In-Reply-To');
+    const references = headers.find(header => header.name === 'References');
+    const customHeader = headers.find(header => header.name === 'X-Tracking-ID');
+
+    return {
+        isReply: Boolean(inReplyTo || references),
+        hasCustomHeader: Boolean(customHeader),
+        customHeaderValue: customHeader ? customHeader.value : null
+    };
+}
+}
 async function fetchEmail(auth, messageId) {
   const gmail = google.gmail({ version: "v1", auth });
   try {
     const response = await gmail.users.messages.get({
       userId: "me",
       id: messageId,
-      format: "full",
+      format: "metadata",
+ metadataHeaders: ['In-Reply-To', 'References', 'X-Tracking-ID'],
     });
     return response.data;
   } catch (error) {
