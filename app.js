@@ -97,27 +97,25 @@ app.post("/track", async (req, res) => {
 
   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
-const data = JSON.parse(emailData)
+  const data = JSON.parse(emailData);
   if (data.historyId) {
     try {
-      const history = await fetchHistory(
-        oAuth2Client,
-        "me",
-        data.historyId
-      );
-console.log(history)
+      const history = await fetchHistory(oAuth2Client, "me", data.historyId);
+      console.log(history);
       if (history && history.history && history.history.length > 0) {
         history.history.forEach(async (historyItem) => {
-	console.log(historyItem)
+          console.log(historyItem);
           historyItem.messages.forEach(async (msg) => {
-console.log({msg})
+            console.log({ msg });
             const message = await fetchEmail(oAuth2Client, msg.id);
-		if(message){
-const result = checkEmailReplyAndHeader(details);
-            if (result.isReply && result.hasCustomHeader) {
-                console.log(`Reply with custom header found: ${result.customHeaderValue}`);
-           }
-
+            if (message) {
+              const result = checkEmailReplyAndHeader(details);
+              if (result.isReply && result.hasCustomHeader) {
+                console.log(
+                  `Reply with custom header found: ${result.customHeaderValue}`
+                );
+              }
+            }
             console.log(message);
           });
         });
@@ -142,21 +140,23 @@ async function fetchHistory(auth, userId, historyId) {
   }
 }
 
-async function handleReplies(email){
-if (!email.payload || !email.payload.headers) return;
+async function handleReplies(email) {
+  if (!email.payload || !email.payload.headers) return;
 
-   const headers = email.payload.headers;
-    const inReplyTo = headers.find(header => header.name === 'In-Reply-To');
-    const references = headers.find(header => header.name === 'References');
-    const customHeader = headers.find(header => header.name === 'X-Tracking-ID');
+  const headers = email.payload.headers;
+  const inReplyTo = headers.find((header) => header.name === "In-Reply-To");
+  const references = headers.find((header) => header.name === "References");
+  const customHeader = headers.find(
+    (header) => header.name === "X-Tracking-ID"
+  );
 
-    return {
-        isReply: Boolean(inReplyTo || references),
-        hasCustomHeader: Boolean(customHeader),
-        customHeaderValue: customHeader ? customHeader.value : null
-    };
+  return {
+    isReply: Boolean(inReplyTo || references),
+    hasCustomHeader: Boolean(customHeader),
+    customHeaderValue: customHeader ? customHeader.value : null,
+  };
 }
-}
+
 async function fetchEmail(auth, messageId) {
   const gmail = google.gmail({ version: "v1", auth });
   try {
@@ -164,7 +164,7 @@ async function fetchEmail(auth, messageId) {
       userId: "me",
       id: messageId,
       format: "metadata",
- metadataHeaders: ['In-Reply-To', 'References', 'X-Tracking-ID'],
+      metadataHeaders: ["In-Reply-To", "References", "X-Tracking-ID"],
     });
     return response.data;
   } catch (error) {
