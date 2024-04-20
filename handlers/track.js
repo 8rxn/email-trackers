@@ -1,5 +1,5 @@
 import fs from "fs";
-import { readFileAsync } from "./lib/utils.js";
+import { readFileAsync } from "../lib/utils.js";
 import { google } from "googleapis";
 
 export async function trackOpens(req, res) {

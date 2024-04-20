@@ -1,6 +1,6 @@
 import express from "express";
-import { sendMail } from "./mail.js";
-import { trackOpens, trackReplies } from "./track.js";
+import { sendMail } from "./handlers/mail.js";
+import { trackOpens, trackReplies } from "./handlers/track.js";
 import { google } from "googleapis";
 import { config } from "dotenv";
 import bodyparser from "body-parser";
@@ -34,11 +34,11 @@ async function startGmailWatch(authClient, userEmail) {
 
   try {
     const res = await gmail.users.watch({
-      userId: userEmail, // Use 'me' to indicate the authenticated user.
+      userId: userEmail, 
       requestBody: {
         topicName: `projects/mail-tester-420819/topics/emails`,
-        labelIds: ["INBOX"], // Optional: specify labels to watch; remove if watching all.
-        labelFilterAction: "include", // Can be 'include' or 'exclude'
+        labelIds: ["INBOX"], 
+        labelFilterAction: "include",
       },
     });
     console.log("Successfully set up watch:", res.data);

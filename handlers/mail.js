@@ -1,10 +1,8 @@
 import { createTransport } from "nodemailer";
 import { config } from "dotenv";
-import { readFileAsync } from "./lib/utils.js";
+import { readFileAsync } from "../lib/utils.js";
 
 import { randomUUID } from "crypto";
-
-// Change this File Path to Change Templates:
 
 config();
 
