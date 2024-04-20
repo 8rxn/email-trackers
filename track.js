@@ -39,7 +39,7 @@ export async function trackOpens(req, res) {
   res.sendFile("transparent.gif", { root: "." });
 }
 
-let processedMessageIds = new Set();
+let processedHistoryIds = new Set();
 
 export async function trackReplies(req, oAuth2Client) {
   const message = req.body.message;
@@ -48,15 +48,15 @@ export async function trackReplies(req, oAuth2Client) {
   console.log({ messageId });
   const emailData = Buffer.from(message.data, "base64").toString("utf-8");
 
-  if (processedMessageIds.has(messageId)) {
+  //   console.log("Received message ID:", messageId);
+  console.log("Email notification data:", emailData);
+  const data = JSON.parse(emailData);
+  if (processedHistoryIds.has(data.historyID)) {
     console.log("Duplicate message received, skipping processing.");
     return;
   }
 
-  processedMessageIds.add(messageId);
-  //   console.log("Received message ID:", messageId);
-  console.log("Email notification data:", emailData);
-  const data = JSON.parse(emailData);
+  processedHistoryIds.add(historyID);
   if (data.historyId) {
     try {
       const response = await fetchLatestEmail(oAuth2Client, "me");
@@ -76,7 +76,7 @@ export async function trackReplies(req, oAuth2Client) {
             email.payload.headers.find((header) => header.name === "From")
               .value !== message.email
           ) {
-   //         console.log(email.payload.headers);
+            //         console.log(email.payload.headers);
             const fromAddress = email.payload.headers.find(
               (header) => header.name.toLowerCase() === "from"
             ).value;
