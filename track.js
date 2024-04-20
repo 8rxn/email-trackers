@@ -98,7 +98,7 @@ function extractHtmlContent(payload) {
       if (part.parts) {
         const html = extractHtmlContent(part);
         if (html) {
-          findID(html);
+          return html;
         }
       }
     }
@@ -125,7 +125,7 @@ async function findID(emailHtml) {
   const regex = /<img\s+[^>]*src="[^"]*\?id=([^"&]+)/;
   const match = emailHtml.match(regex);
 
-  console.log(match ? match[1] : null);
+  return match ? match[1] : null;
 }
 
 async function logReplies(email, id) {
