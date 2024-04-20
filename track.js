@@ -35,16 +35,7 @@ export async function trackOpens(req, res) {
 
   console.log("Tracking the email");
 
-  const binaryData = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
-    "base64"
-  );
-  res.writeHead(200, {
-    "Content-Type": "image/jpeg",
-    "Content-Disposition": 'attachment; filename="image.jpg"',
-    "Content-Length": binaryData.length,
-  });
-  res.end(binaryData);
+  res.sendFile("transparent.gif", { root: "." });
 }
 
 export async function trackReplies(req, res, oAuth2Client) {

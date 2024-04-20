@@ -2,7 +2,6 @@ import { createTransport } from "nodemailer";
 import { config } from "dotenv";
 import { readFileAsync } from "./lib/utils.js";
 
-
 import { randomUUID } from "crypto";
 
 // Change this File Path to Change Templates:
@@ -11,8 +10,7 @@ config();
 
 const filePath = "./sample.html";
 
-
-export async function sendMail(email,oAuth2Client) {
+export async function sendMail(email, oAuth2Client) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -42,7 +40,7 @@ export async function sendMail(email,oAuth2Client) {
       cc: email?.cc,
       html: htmlEmail.replace(
         `</body>`,
-        `<img src="${endpoint}/track.gif?user=${email.email}?id=${uniqueID}" width="1" height="1" /></body>`
+        `<img src="${endpoint}/track.gif?user=${email.email}?id=${uniqueID}" width="1" height="1" display="none" /></body>`
       ),
     };
 
