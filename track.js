@@ -4,7 +4,7 @@ import { google } from "googleapis";
 
 export async function trackOpens(req, res) {
   const { email, id } = req.query;
-
+  
   const filePath = "dataStore.json";
 
   let logs = JSON.parse(await readFileAsync(filePath));
@@ -38,8 +38,7 @@ export async function trackOpens(req, res) {
   res.sendFile("transparent.gif", { root: "." });
 }
 
-export async function trackReplies(req, res, oAuth2Client) {
-  res.status(204).end();
+export async function trackReplies(req, oAuth2Client) {
 
   const message = req.body.message;
   //   console.log({ message });
@@ -52,12 +51,12 @@ export async function trackReplies(req, res, oAuth2Client) {
   if (data.historyId) {
     try {
       const response = await fetchLatestEmail(oAuth2Client, "me");
-      //   console.log(response.data.messages);
+//      console.log(response.data.messages);
 
       for (const message of response.data.messages) {
         const email = await fetchEmail(oAuth2Client, message.id);
         const parsedEmail = extractHtmlContent(email.payload);
-        // console.log(parsedEmail);
+  //      console.log(parsedEmail);
         if (parsedEmail) {
           const id = await findID(parsedEmail);
           if (
@@ -128,7 +127,7 @@ async function fetchEmail(auth, messageId) {
 }
 
 async function findID(emailHtml) {
-  const regex = /<img\s+[^>]*src="[^"]*\?id=([^"&]+)/;
+  const regex = /<img\s+[^>]*src="[^"]*\&amp;id=([^"&]+)/;
   const match = emailHtml.match(regex);
 
   return match ? match[1] : null;

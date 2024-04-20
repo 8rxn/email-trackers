@@ -64,34 +64,36 @@ app.get("/oauth2callback", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.status(200).send(`<h1>Hello Mailer</h1>
-    <p>Send an email by sending a GET request to /send-emai?email=<youremail></p>
+    <p>Send an email by sending a GET request to /send-email?email=<youremail></p>
     <p>Listen to Email Events in /updates</p>`);
 });
 
 app.get("/send-email", (req, res) => {
   const { email } = req.query;
   console.log(email);
-  let mailIds = [
-    {
-      email: "rajxryn@gmail.com",
-    },
-  ];
-  if (email) {
+
+	let mailIds = [  ];
+if(!email){
+mailIds.push({ email:"rajxryn@gmail.com" });
+}
+	if (email) {
     mailIds.push({ email });
   }
 
   mailIds.forEach(async (email) => {
     const result = await sendMail(email, oAuth2Client);
     console.log(result);
-    res
-      .send(`Emails Sent to ${mailIds.map((mail) => mail.email).join(", ")}`);
+    
   });
+	res
+      .send(`Emails Sent to ${mailIds.map((mail) => mail.email).join(", ")}`);
 });
 
 app.get("/track.gif", trackOpens);
 
 app.post("/track", (req, res) => {
-  trackReplies(req, res, oAuth2Client);
+  res.status(204).end();
+  trackReplies(req, oAuth2Client);
 });
 
 app.get("/updates", viewUpdates);
