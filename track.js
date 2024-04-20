@@ -68,7 +68,7 @@ export async function trackReplies(req, res, oAuth2Client) {
 
             console.log(fromAddress);
 
-            logReplies(fromAddress, match[1]);
+            logReplies(fromAddress, id);
           }
         }
       }
