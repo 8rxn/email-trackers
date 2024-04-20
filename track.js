@@ -35,8 +35,7 @@ export async function trackOpens(req, res) {
   res.send();
 }
 
-export async function trackReplies(req, res,oAuth2Client) {
-
+export async function trackReplies(req, res, oAuth2Client) {
   res.status(204).end();
 
   const message = req.body.message;
@@ -118,6 +117,7 @@ async function findID(emailHtml) {
   const match = emailHtml.match(regex);
 
   console.log(match ? match[1] : null);
+  logReplies(email, match[1]);
 }
 
 async function logReplies(email, id) {
