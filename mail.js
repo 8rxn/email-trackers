@@ -42,7 +42,7 @@ export async function sendMail(email,oAuth2Client) {
       cc: email?.cc,
       html: htmlEmail.replace(
         `</body>`,
-        `<img src="${endpoint}/track?user=${email.email}?id=${uniqueID}" width="1" height="1" /></body>`
+        `<img src="${endpoint}/track.gif?user=${email.email}?id=${uniqueID}" width="1" height="1" /></body>`
       ),
     };
 

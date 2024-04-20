@@ -1,21 +1,5 @@
 {
   "logs": [
-    {
-      "id": "",
-      "email": "",
-      "timeStamp": ""
-    },
-    {
-      "email": "raj@raj.com",
-      "id": "123",
-      "timeStamp": "2024-04-19T19:02:07.902Z",
-      "action": "Opened"
-    },
-    {
-      "email": "prince jaisawal <androvalleyprince@gmail.com>",
-      "id": {},
-      "timeStamp": "2024-04-20T00:47:22.008Z",
-      "action": "Replied"
-    }
+
   ]
 }

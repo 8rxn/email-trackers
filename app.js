@@ -4,6 +4,7 @@ import { trackOpens, trackReplies } from "./track.js";
 import { google } from "googleapis";
 import { config } from "dotenv";
 import bodyparser from "body-parser";
+import { viewUpdates } from "./handlers/updates.js";
 
 config();
 
@@ -51,7 +52,6 @@ startGmailWatch(oAuth2Client, "me");
 
 app.get("/oauth2callback", async (req, res) => {
   const { code } = req.query;
-
   try {
     const { tokens } = oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
@@ -69,8 +69,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/send-email", (req, res) => {
-  const {email} = req.query
-	console.log(email)
+  const { email } = req.query;
+  console.log(email);
   let mailIds = [
     {
       email: "rajxryn@gmail.com",
@@ -87,11 +87,13 @@ app.get("/send-email", (req, res) => {
   });
 });
 
-app.get("/track", trackOpens);
+app.get("/track.gif", trackOpens);
 
 app.post("/track", (req, res) => {
   trackReplies(req, res, oAuth2Client);
 });
+
+app.get("/updates", viewUpdates);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
