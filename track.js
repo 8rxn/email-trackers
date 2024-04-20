@@ -66,7 +66,7 @@ export async function trackReplies(req, res, oAuth2Client) {
               (header) => header.name.toLowerCase() === "from"
             ).value;
 
-            console.log(fromAddress);
+            console.log(fromAddress, id);
 
             logReplies(fromAddress, id);
           }
@@ -131,10 +131,11 @@ async function logReplies(email, id) {
   const filePath = "dataStore.json";
 
   let logs = JSON.parse(await readFileAsync(filePath));
+  console.log({ id });
 
   logs.logs.push({
     email,
-    id,
+    id: id,
     timeStamp: new Date().toISOString(),
     action: "Replied",
   });
