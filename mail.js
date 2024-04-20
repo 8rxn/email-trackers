@@ -1,7 +1,7 @@
 import { createTransport } from "nodemailer";
-import { google } from "googleapis";
-import { readFile } from "fs";
 import { config } from "dotenv";
+import { readFileAsync } from "./lib/utils.js";
+
 
 import { randomUUID } from "crypto";
 
@@ -11,17 +11,6 @@ config();
 
 const filePath = "./sample.html";
 
-function readFileAsync(filePath) {
-  return new Promise((resolve, reject) => {
-    readFile(filePath, "utf8", (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
 
 export async function sendMail(email,oAuth2Client) {
   try {
@@ -43,7 +32,7 @@ export async function sendMail(email,oAuth2Client) {
 
     const uniqueID = randomUUID();
 
-    const endpoint = "https://via.placeholder.com/150";
+    const endpoint = process.env.ENDPOINT;
 
     const mailOptions = {
       from: "Raj from Some Test Email <raj@rajaryan.work>",
@@ -53,7 +42,7 @@ export async function sendMail(email,oAuth2Client) {
       cc: email?.cc,
       html: htmlEmail.replace(
         `</body>`,
-        `<img src="${endpoint}/footer.gif?user=${email.email}?id=${uniqueID}" width="1" height="1" /></body>`
+        `<img src="${endpoint}/track?user=${email.email}?id=${uniqueID}" width="1" height="1" /></body>`
       ),
     };
 
