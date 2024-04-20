@@ -60,9 +60,10 @@ export async function trackReplies(req, res, oAuth2Client) {
         const parsedEmail = extractHtmlContent(email.payload);
         // console.log(parsedEmail);
         if (parsedEmail) {
-          const id = findID(parsedEmail);
+          const id = await findID(parsedEmail);
           if (id) {
-            const fromAddress = email.payload.headers.find(
+            console.log(email.payload.headers)
+		  const fromAddress = email.payload.headers.find(
               (header) => header.name.toLowerCase() === "from"
             ).value;
 

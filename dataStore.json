@@ -1,5 +1,34 @@
 {
   "logs": [
-
+    {
+      "email": "raj@raj.com",
+      "id": "123",
+      "timeStamp": "2024-04-20T00:57:04.427Z",
+      "action": "Opened"
+    },
+    {
+      "email": "raj@raj.com",
+      "id": "123",
+      "timeStamp": "2024-04-20T00:57:39.284Z",
+      "action": "Opened"
+    },
+    {
+      "email": "prince jaisawal <androvalleyprince@gmail.com>",
+      "id": {},
+      "timeStamp": "2024-04-20T00:58:18.757Z",
+      "action": "Replied"
+    },
+    {
+      "email": "Upstash <support@upstash.com>",
+      "id": {},
+      "timeStamp": "2024-04-20T01:01:10.139Z",
+      "action": "Replied"
+    },
+    {
+      "email": "Upstash <support@upstash.com>",
+      "id": {},
+      "timeStamp": "2024-04-20T01:01:17.779Z",
+      "action": "Replied"
+    }
   ]
 }
