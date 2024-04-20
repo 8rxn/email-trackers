@@ -13,7 +13,7 @@ export async function trackOpens(req, res) {
     return res.status(400).send("Missing email or id");
   }
 
-  proce;
+
   const log = {
     email,
     id,
@@ -50,15 +50,25 @@ export async function trackReplies(req, oAuth2Client) {
 
   //   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
-  const data = JSON.parse(emailData);
-  if (processedHistoryIds.has(data.historyID)) {
+	console.log(emailData)
+let data
+	console.log(typeof emailData)
+	try {
+    data = JSON.parse(emailData);
+    console.log("Email Address:", data.emailAddress);
+    console.log("History ID:", data.historyId);
+} catch (error) {
+    console.error("Error parsing JSON:", error);
+}
+	console.log(processedHistoryIds, data.historyId)
+  if (processedHistoryIds.has(data.historyId)) {
     console.log("Duplicate message received, skipping processing.");
     return;
   }
-
-  processedHistoryIds.add(historyID);
   if (data.historyId) {
-    try {
+ processedHistoryIds.add(data.historyId);
+
+	  try {
       const response = await fetchLatestEmail(oAuth2Client, "me");
       //      console.log(response.data.messages);
 
@@ -82,8 +92,8 @@ export async function trackReplies(req, oAuth2Client) {
             ).value;
 
             console.log(fromAddress, id);
-
-            logReplies(fromAddress, id);
+console.log(typeof fromAddress);
+            logReplies(`${fromAddress}`, id);
           }
         }
       }

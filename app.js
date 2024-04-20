@@ -65,7 +65,7 @@ app.get("/oauth2callback", async (req, res) => {
 app.get("/", (req, res) => {
   res.status(200).send(`<h1>Hello Mailer</h1>
     <p>Send an email by sending a GET request to /send-email?email=<youremail></p>
-    <p>Listen to Email Events in /updates</p>`);
+    <p>Checkout Email Events in /updates</p>`);
 });
 
 app.get("/send-email", (req, res) => {
