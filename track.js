@@ -1,5 +1,6 @@
 import fs from "fs";
 import { readFileAsync } from "./lib/utils.js";
+import { google } from "googleapis";
 
 export async function trackOpens(req, res) {
   const { email, id } = req.query;
@@ -61,6 +62,10 @@ export async function trackReplies(req, res, oAuth2Client) {
             const fromAddress = email.payload.headers.find(
               (header) => header.name.toLowerCase() === "from"
             ).value;
+
+            console.log(fromAddress);
+
+            logReplies(fromAddress, match[1]);
           }
         }
       }
@@ -117,7 +122,6 @@ async function findID(emailHtml) {
   const match = emailHtml.match(regex);
 
   console.log(match ? match[1] : null);
-  logReplies(email, match[1]);
 }
 
 async function logReplies(email, id) {

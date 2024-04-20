@@ -69,7 +69,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/send-email", (req, res) => {
-  const email = req.query("email");
+  const {email} = req.query;
 
   let mailIds = [
     {
