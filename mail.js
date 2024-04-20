@@ -33,7 +33,7 @@ export async function sendMail(email, oAuth2Client) {
     const endpoint = process.env.ENDPOINT;
 
     const mailOptions = {
-      from: "Raj from Some Test Email <raj@rajaryan.work>",
+      from: "Raj from Some Test Email <test-email@rajaryan.work>",
       to: email.email,
       subject: "Test Email from Node.js using Nodemailer & Gmail OAuth2.0",
       text: "Just Testing Out whether you see my email or not",
