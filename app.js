@@ -101,30 +101,47 @@ app.post("/track", async (req, res) => {
   const data = JSON.parse(emailData);
   if (data.historyId) {
     try {
-      const history = await fetchHistory(oAuth2Client, "me", data.historyId);
-      console.log(history);
-      if (history && history.history && history.history.length > 0) {
-        history.history.forEach(async (historyItem) => {
-          console.log(historyItem);
-          historyItem.messages.forEach(async (msg) => {
-            console.log({ msg });
-            const message = await fetchEmail(oAuth2Client, msg.id);
-            if (message) {
-              const html = extractHtmlContent(message.payload);
-              console.log(html);
+      const response = await fetchLatestEmail(oAuth2Client, "me");
+      console.log(response.data.messages);
 
-              if (html) {
-		      findID(html)
-              }
-            }
-          });
-        });
+      for (const message of response.data.messages) {
+        const email = await fetchEmail(oAuth2Client, message.id);
+        const parsedEmail = extractHtmlContent(email.payload);
+        console.log(parsedEmail);
+        if (parsedEmail) {
+          findID(parsedEmail);
+        }
       }
+
+      //   if (history && history.history && history.history.length > 0) {
+      //     history.history.forEach(async (historyItem) => {
+      //       console.log(historyItem);
+      //       historyItem.messages.forEach(async (msg) => {
+      //         console.log({ msg });
+      //         const message = await fetchEmail(oAuth2Client, msg.id);
+      //         if (message) {
+      //           const html = extractHtmlContent(message.payload);
+      //           console.log(html);
+      //           if (html) {
+      // 	      findID(html)
+      //           }
+      //         }
+      //       });
+      //     });
+      //   }
     } catch (error) {
       console.error("Error fetching email:", error);
     }
   }
 });
+
+function fetchLatestEmail(auth, userId) {
+  const gmail = google.gmail({ version: "v1", auth });
+  return gmail.users.messages.list({
+    userId: userId,
+    maxResults: 1,
+  });
+}
 
 function extractHtmlContent(payload) {
   if (payload.mimeType === "text/html") {
