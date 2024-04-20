@@ -45,6 +45,7 @@ export async function trackReplies(req, oAuth2Client) {
   const message = req.body.message;
   //   console.log({ message });
   const messageId = message.messageId;
+  console.log({ messageId });
   const emailData = Buffer.from(message.data, "base64").toString("utf-8");
 
   if (processedMessageIds.has(messageId)) {
@@ -75,7 +76,7 @@ export async function trackReplies(req, oAuth2Client) {
             email.payload.headers.find((header) => header.name === "From")
               .value !== message.email
           ) {
-            console.log(email.payload.headers);
+   //         console.log(email.payload.headers);
             const fromAddress = email.payload.headers.find(
               (header) => header.name.toLowerCase() === "from"
             ).value;
