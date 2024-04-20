@@ -4,7 +4,7 @@ import { google } from "googleapis";
 
 export async function trackOpens(req, res) {
   const { email, id } = req.query;
-  
+
   const filePath = "dataStore.json";
 
   let logs = JSON.parse(await readFileAsync(filePath));
@@ -13,6 +13,7 @@ export async function trackOpens(req, res) {
     return res.status(400).send("Missing email or id");
   }
 
+  proce;
   const log = {
     email,
     id,
@@ -38,25 +39,32 @@ export async function trackOpens(req, res) {
   res.sendFile("transparent.gif", { root: "." });
 }
 
-export async function trackReplies(req, oAuth2Client) {
+let processedMessageIds = new Set();
 
+export async function trackReplies(req, oAuth2Client) {
   const message = req.body.message;
   //   console.log({ message });
   const messageId = message.messageId;
   const emailData = Buffer.from(message.data, "base64").toString("utf-8");
 
+  if (processedMessageIds.has(messageId)) {
+    console.log("Duplicate message received, skipping processing.");
+    return;
+  }
+
+  processedMessageIds.add(messageId);
   //   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
   const data = JSON.parse(emailData);
   if (data.historyId) {
     try {
       const response = await fetchLatestEmail(oAuth2Client, "me");
-//      console.log(response.data.messages);
+      //      console.log(response.data.messages);
 
       for (const message of response.data.messages) {
         const email = await fetchEmail(oAuth2Client, message.id);
         const parsedEmail = extractHtmlContent(email.payload);
-  //      console.log(parsedEmail);
+        //      console.log(parsedEmail);
         if (parsedEmail) {
           const id = await findID(parsedEmail);
           if (
