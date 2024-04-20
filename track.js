@@ -13,12 +13,15 @@ export async function trackOpens(req, res) {
     return res.status(400).send("Missing email or id");
   }
 
-  logs.logs.push({
+  const log = {
     email,
     id,
     timeStamp: new Date().toISOString(),
     action: "Opened",
-  });
+  };
+  console.log(log);
+
+  logs.logs.push(log);
 
   const updatedJsonData = JSON.stringify(logs, null, 2);
 
