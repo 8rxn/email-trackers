@@ -63,7 +63,7 @@ app.get("/oauth2callback", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Hello Mailer</h1>
+  res.status(200).send(`<h1>Hello Mailer</h1>
     <p>Send an email by sending a GET request to /send-emai?email=<youremail></p>
     <p>Listen to Email Events in /updates</p>`);
 });
@@ -83,7 +83,8 @@ app.get("/send-email", (req, res) => {
   mailIds.forEach(async (email) => {
     const result = await sendMail(email, oAuth2Client);
     console.log(result);
-    res.send("Emails Sent to ", mailIds.map((mail) => mail.email).join(", "));
+    res
+      .send(`Emails Sent to ${mailIds.map((mail) => mail.email).join(", ")}`);
   });
 });
 

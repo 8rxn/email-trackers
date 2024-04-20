@@ -35,8 +35,16 @@ export async function trackOpens(req, res) {
 
   console.log("Tracking the email");
 
-  res.type("image/png");
-  res.send();
+  const binaryData = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+    "base64"
+  );
+  res.writeHead(200, {
+    "Content-Type": "image/jpeg",
+    "Content-Disposition": 'attachment; filename="image.jpg"',
+    "Content-Length": binaryData.length,
+  });
+  res.end(binaryData);
 }
 
 export async function trackReplies(req, res, oAuth2Client) {
@@ -61,9 +69,16 @@ export async function trackReplies(req, res, oAuth2Client) {
         // console.log(parsedEmail);
         if (parsedEmail) {
           const id = await findID(parsedEmail);
-          if (id) {
-            console.log(email.payload.headers)
-		  const fromAddress = email.payload.headers.find(
+          if (
+            id &&
+            email.payload.headers.find(
+              (header) => header.name === "In-Reply-To"
+            ) &&
+            email.payload.headers.find((header) => header.name === "From")
+              .value !== message.email
+          ) {
+            console.log(email.payload.headers);
+            const fromAddress = email.payload.headers.find(
               (header) => header.name.toLowerCase() === "from"
             ).value;
 
