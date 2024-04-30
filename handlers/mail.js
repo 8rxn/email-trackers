@@ -49,20 +49,19 @@ export async function sendMail(email, oAuth2Client, scheduled) {
     }
 
     const result = await transport.sendMail(mailOptions);
+console.log(scheduled)
 
-    if (scheduled) {
-      console.log("should update");
-      db.scheduledEmails.updateMany({
-        data: {
+await db.scheduledEmails.updateMany({
+        where: {
           id: email.id,
+        },
+        data: {
           sentAt: new Date(),
           status: "SENT",
           logsId: dbEmail.id,
         },
       });
-    }
-
-    return result;
+  return result;
   } catch (error) {
     return error;
   }
