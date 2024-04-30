@@ -9,12 +9,12 @@ datasource db {
 
 model ScheduledEmails {
   id        String     @id @default(cuid())
-  email     String     
+  email     String
   createdAt DateTime   @default(now())
   status    Status     @default(PENDING)
   sentAt    DateTime?
   logsId    String?
-  logs      EmailLogs? @relation(fields: [logsId], references: [id])
+  logs      EmailLogs? @relation(fields: [logsId], references: [id], onDelete: Cascade)
 }
 
 model EmailLogs {
@@ -30,7 +30,7 @@ model Tracker {
   type      TrackerType
   emailId   String
   createdAt DateTime    @default(now())
-  email     EmailLogs   @relation(fields: [emailId], references: [id])
+  email     EmailLogs   @relation(fields: [emailId], references: [id], onDelete: Cascade)
 }
 
 enum Status {
