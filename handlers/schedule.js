@@ -6,9 +6,9 @@ async function scheduleView(req, res) {
     orderBy: { createdAt: "desc" },
   });
 
-  const htmlOutput = `<h1>Pending Scheduled Mails</h1>
+  let htmlOutput = `<h1>Pending Scheduled Mails</h1>
   
-  <p>Emails Are sent every 10 minutes to all pending scheduled addresses</p>
+  <p>Emails are sent every 10 minutes to oldest pending scheduled address</p>
   <br/>
   <p>Add temp addreses by going to /schedule/test</p>
   
@@ -21,12 +21,16 @@ async function scheduleView(req, res) {
     </tr>`;
 
   emails.forEach((e) => {
-    htmlOutput += `;<tr>
+    htmlOutput += `<tr>
     <td style="padding: 2px 10px;">${e.id}</td>
     <td style="padding: 2px 10px;">${e.email}</td>
     <td style="padding: 2px 10px;">${e.createdAt}</td>
   </tr>`;
   });
+
+  htmlOutput += `</table>`;
+
+  res.send(htmlOutput);
 }
 
 export default scheduleView;

@@ -158,15 +158,14 @@ cron.schedule("*/10 * * * *", async () => {
     "Sending any pending Scheduled Emails At ",
     new Date().toISOString()
   );
-  const emails = await db.scheduledEmails.findMany({
+  const email = await db.scheduledEmails.findFirst({
     where: {
       status: "PENDING",
     },
-  });
-  console.log(emails);
-  const emailPromise = emails.map(async (email) => {
-    return sendMail(email, oAuth2Client);
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
-  await Promise.all(emailPromise);
+  await sendMail(email, oAuth2Client);
 });
