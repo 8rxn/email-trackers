@@ -51,5 +51,33 @@ export async function viewUpdates(req, res) {
   });
 
   htmlOutput += `</table>`;
+
+  const trackers = await db.tracker.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      email: true,
+    },
+  });
+
+  htmlOutput += `<h2>All Trackers</h2>`;
+  htmlOutput += `<table border="1">
+    <tr>
+      <th>ID</th>
+      <th>Email Address</th>
+      <th>Type</th>
+      <th>Created At</th>
+    </tr>`;
+  trackers.forEach((track) => {
+    htmlOutput += `
+    <tr>
+      <td style="padding: 2px 10px;">${track.id}</td>
+      <td style="padding: 2px 10px;">${track.email.emailTo}</td>
+      <td style="padding: 2px 10px;">${track.type}</td>
+      <td style="padding: 2px 10px;">${track.createdAt.toString()}</td>
+    </tr>`;
+  });
+
+  htmlOutput += `</table>`;
+
   res.send(htmlOutput);
 }
