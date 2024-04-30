@@ -1,42 +1,25 @@
-import fs from "fs";
-import { readFileAsync } from "../lib/utils.js";
+// import fs from "fs";
+// import { readFileAsync } from "../lib/utils.js";
 import { google } from "googleapis";
+import db from "../lib/db.js";
 
 export async function trackOpens(req, res) {
   const { email, id } = req.query;
-
-  const filePath = "dataStore.json";
-
-  let logs = JSON.parse(await readFileAsync(filePath));
 
   if (!email || !id) {
     return res.status(400).send("Missing email or id");
   }
 
+  res.sendFile("transparent.gif", { root: "." });
 
-  const log = {
-    email,
-    id,
-    timeStamp: new Date().toISOString(),
-    action: "Opened",
-  };
-  console.log(log);
-
-  logs.logs.push(log);
-
-  const updatedJsonData = JSON.stringify(logs, null, 2);
-
-  fs.writeFile(filePath, updatedJsonData, "utf8", (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-      return;
-    }
-    console.log("Successfully updated the file with new data.");
+  await db.tracker.create({
+    data: {
+      type: "OPEN",
+      emailId: id,
+    },
   });
 
   console.log("Tracking the email");
-
-  res.sendFile("transparent.gif", { root: "." });
 }
 
 let processedHistoryIds = new Set();
@@ -50,25 +33,25 @@ export async function trackReplies(req, oAuth2Client) {
 
   //   console.log("Received message ID:", messageId);
   console.log("Email notification data:", emailData);
-	console.log(emailData)
-let data
-	console.log(typeof emailData)
-	try {
+  console.log(emailData);
+  let data;
+  console.log(typeof emailData);
+  try {
     data = JSON.parse(emailData);
     console.log("Email Address:", data.emailAddress);
     console.log("History ID:", data.historyId);
-} catch (error) {
+  } catch (error) {
     console.error("Error parsing JSON:", error);
-}
-	console.log(processedHistoryIds, data.historyId)
+  }
+  console.log(processedHistoryIds, data.historyId);
   if (processedHistoryIds.has(data.historyId)) {
     console.log("Duplicate message received, skipping processing.");
     return;
   }
   if (data.historyId) {
- processedHistoryIds.add(data.historyId);
+    processedHistoryIds.add(data.historyId);
 
-	  try {
+    try {
       const response = await fetchLatestEmail(oAuth2Client, "me");
       //      console.log(response.data.messages);
 
@@ -87,13 +70,11 @@ let data
               .value !== message.email
           ) {
             //         console.log(email.payload.headers);
-            const fromAddress = email.payload.headers.find(
-              (header) => header.name.toLowerCase() === "from"
-            ).value;
+            // const fromAddress = email.payload.headers.find(
+            //   (header) => header.name.toLowerCase() === "from"
+            // ).value;
 
-            console.log(fromAddress, id);
-console.log(typeof fromAddress);
-            logReplies(`${fromAddress}`, id);
+            logReplies(id);
           }
         }
       }
@@ -152,26 +133,13 @@ async function findID(emailHtml) {
   return match ? match[1] : null;
 }
 
-async function logReplies(email, id) {
-  const filePath = "dataStore.json";
-
-  let logs = JSON.parse(await readFileAsync(filePath));
+async function logReplies(id) {
   console.log({ id });
 
-  logs.logs.push({
-    email,
-    id: id,
-    timeStamp: new Date().toISOString(),
-    action: "Replied",
-  });
-
-  const updatedJsonData = JSON.stringify(logs, null, 2);
-
-  fs.writeFile(filePath, updatedJsonData, "utf8", (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-      return;
-    }
-    console.log("Successfully updated the file with new data.");
+  await db.tracker.create({
+    data: {
+      type: "REPLY",
+      emailId: id,
+    },
   });
 }

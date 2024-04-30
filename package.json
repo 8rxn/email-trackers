@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@prisma/client": "^5.13.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -18,6 +19,11 @@
     "fs": "0.0.1-security",
     "googleapis": "^134.0.0",
     "mailparser": "^3.7.0",
-    "nodemailer": "^6.9.13"
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.13",
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "prisma": "^5.13.0"
   }
 }

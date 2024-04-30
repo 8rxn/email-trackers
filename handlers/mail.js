@@ -2,13 +2,13 @@ import { createTransport } from "nodemailer";
 import { config } from "dotenv";
 import { readFileAsync } from "../lib/utils.js";
 
-import { randomUUID } from "crypto";
+import db from "../lib/db.js";
 
 config();
 
 const filePath = "./sample.html";
 
-export async function sendMail(email, oAuth2Client) {
+export async function sendMail(email, oAuth2Client, scheduled) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -26,7 +26,9 @@ export async function sendMail(email, oAuth2Client) {
 
     const htmlEmail = await readFileAsync(filePath);
 
-    const uniqueID = randomUUID();
+    const dbEmail = await db.emailLogs.create({
+      data: { emailTo: email.email },
+    });
 
     const endpoint = process.env.ENDPOINT;
 
@@ -38,7 +40,7 @@ export async function sendMail(email, oAuth2Client) {
       cc: email?.cc,
       html: htmlEmail.replace(
         `</body>`,
-        `<img src="${endpoint}/track.gif?email=${email.email}&id=${uniqueID}" width="1" height="1" display="none" /></body>`
+        `<img src="${endpoint}/track.gif?email=${email.email}&id=${dbEmail.id}" width="1" height="1" display="none" /></body>`
       ),
     };
 
@@ -47,6 +49,13 @@ export async function sendMail(email, oAuth2Client) {
     }
 
     const result = await transport.sendMail(mailOptions);
+
+    if (scheduled) {
+      db.scheduledEmails.update({
+        data: { logsId: dbEmail.id, sentAt: new Date(), status: "SENT" },
+      });
+    }
+
     return result;
   } catch (error) {
     return error;

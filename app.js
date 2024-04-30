@@ -5,6 +5,9 @@ import { google } from "googleapis";
 import { config } from "dotenv";
 import bodyparser from "body-parser";
 import { viewUpdates } from "./handlers/updates.js";
+import db from "./lib/db.js";
+import cron from "node-cron";
+// import { init, sql } from "./lib/db.js";
 
 config();
 
@@ -34,10 +37,10 @@ async function startGmailWatch(authClient, userEmail) {
 
   try {
     const res = await gmail.users.watch({
-      userId: userEmail, 
+      userId: userEmail,
       requestBody: {
         topicName: `projects/mail-tester-420819/topics/emails`,
-        labelIds: ["INBOX"], 
+        labelIds: ["INBOX"],
         labelFilterAction: "include",
       },
     });
@@ -72,21 +75,39 @@ app.get("/send-email", (req, res) => {
   const { email } = req.query;
   console.log(email);
 
-	let mailIds = [  ];
-if(!email){
-mailIds.push({ email:"rajxryn@gmail.com" });
-}
-	if (email) {
+  let mailIds = [];
+  if (!email) {
+    mailIds.push({ email: "rajxryn@gmail.com" });
+  }
+  if (email) {
     mailIds.push({ email });
   }
 
   mailIds.forEach(async (email) => {
-    const result = await sendMail(email, oAuth2Client);
-    console.log(result);
-    
+    await sendMail(email, oAuth2Client);
   });
-	res
-      .send(`Emails Sent to ${mailIds.map((mail) => mail.email).join(", ")}`);
+  res.send(`Emails Sent to ${mailIds.map((mail) => mail.email).join(", ")}`);
+});
+
+app.get("/schedule", async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).send("Email is required");
+    }
+    console.log(email);
+
+    await db.scheduledEmails.create({
+      data: {
+        email: email,
+        status: "PENDING",
+      },
+    });
+    res.send(`Email Scheduled to ${email}`);
+  } catch (error) {
+    console.error("Error scheduling email:", error);
+    res.status(500).send("Error scheduling email");
+  }
 });
 
 app.get("/track.gif", trackOpens);
@@ -100,4 +121,16 @@ app.get("/updates", viewUpdates);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
+});
+
+cron.schedule("*/10 * * * *", async () => {
+  console.log("sending emails at ", new Date().toISOString());
+  const emails = await db.scheduledEmails.findMany({
+    where: {
+      status: "PENDING",
+    },
+  });
+  emails.forEach(async (email) => {
+    await sendMail(email, oAuth2Client);
+  });
 });

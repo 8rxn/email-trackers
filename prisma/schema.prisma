@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ScheduledEmails {
+  id        String     @id @default(cuid())
+  email     String     
+  createdAt DateTime   @default(now())
+  status    Status     @default(PENDING)
+  sentAt    DateTime?
+  logsId    String?
+  logs      EmailLogs? @relation(fields: [logsId], references: [id])
+}
+
+model EmailLogs {
+  id              String            @id @default(cuid())
+  emailTo         String
+  createdAt       DateTime          @default(now())
+  ScheduledEmails ScheduledEmails[]
+  Tracker         Tracker[]
+}
+
+model Tracker {
+  id        String      @id @default(cuid())
+  type      TrackerType
+  emailId   String
+  createdAt DateTime    @default(now())
+  email     EmailLogs   @relation(fields: [emailId], references: [id])
+}
+
+enum Status {
+  PENDING
+  SENT
+}
+
+enum TrackerType {
+  OPEN
+  REPLY
+}
