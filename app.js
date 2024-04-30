@@ -7,6 +7,7 @@ import bodyparser from "body-parser";
 import { viewUpdates } from "./handlers/updates.js";
 import db from "./lib/db.js";
 import cron from "node-cron";
+import scheduleView from "./handlers/schedule.js";
 // import { init, sql } from "./lib/db.js";
 
 config();
@@ -68,7 +69,11 @@ app.get("/oauth2callback", async (req, res) => {
 app.get("/", (req, res) => {
   res.status(200).send(`<h1>Hello Mailer</h1>
     <p>Send an email by sending a GET request to /send-email?email=<youremail></p>
-    <p>Checkout Email Events in /updates</p>`);
+    <p>Schedule an email by sending a GET request to /schedule?email=<youremail></p>
+    <p>Add temp addreses by going to /schedule/test</p>
+    <p>View Pending Scheduled Emails in /schedule/view</p>
+    <p>Checkout Email Events in /updates</p>
+    `);
 });
 
 app.get("/send-email", (req, res) => {
@@ -110,6 +115,27 @@ app.get("/schedule", async (req, res) => {
   }
 });
 
+app.get("/schedule/test", async (req, res) => {
+  try {
+    const emails = [
+      "androvalleyprince@gmail.com",
+      "rajxryn@gmail.com",
+      "abhiraj@workerai.co",
+      "anshuman@workerai.co",
+    ];
+
+    await db.scheduledEmails.createMany({
+      data: emails.map((e) => ({ email: e })),
+    });
+    res.send(`Email Scheduled \n ${emails}`);
+  } catch (error) {
+    console.error("Error scheduling email:", error);
+    res.status(500).send("Error scheduling email");
+  }
+});
+
+app.get("/schedule/view", scheduleView);
+
 app.get("/track.gif", trackOpens);
 
 app.post("/track", (req, res) => {
@@ -135,7 +161,7 @@ cron.schedule("*/10 * * * *", async () => {
   });
   console.log(emails);
   const emailPromise = emails.map(async (email) => {
-    return sendMail(email, oAuth2Client, true);
+    return sendMail(email, oAuth2Client);
   });
 
   await Promise.all(emailPromise);

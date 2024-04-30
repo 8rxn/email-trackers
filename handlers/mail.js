@@ -8,7 +8,7 @@ config();
 
 const filePath = "./sample.html";
 
-export async function sendMail(email, oAuth2Client, scheduled) {
+export async function sendMail(email, oAuth2Client) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -49,9 +49,9 @@ export async function sendMail(email, oAuth2Client, scheduled) {
     }
 
     const result = await transport.sendMail(mailOptions);
-console.log(scheduled)
 
-await db.scheduledEmails.updateMany({
+    if (email.id) {
+      await db.scheduledEmails.updateMany({
         where: {
           id: email.id,
         },
@@ -61,7 +61,9 @@ await db.scheduledEmails.updateMany({
           logsId: dbEmail.id,
         },
       });
-  return result;
+    }
+
+    return result;
   } catch (error) {
     return error;
   }
