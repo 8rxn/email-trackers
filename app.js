@@ -67,16 +67,19 @@ app.get("/oauth2callback", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.status(200).send(`<h1>Hello Mailer</h1>
-    <p>Send an email by sending a GET request to /send-email?email=<youremail></p>
-    <p>Schedule an email by sending a GET request to /schedule?email=<youremail></p>
-    <p>Add temp addreses by going to /schedule/test</p>
+  res.status(200).send(`
+    <h1>Hello Mailer</h1>
+    <p>Send an email by sending a GET request to <a href="/send-email">/send-email?email=youremail@example.com</a></p>
+    <p>Schedule an email by sending a GET request to <a href="/schedule">/schedule?email=youremail@example.com</a></p>
+    <p>Add temp addresses by going to <a href="/schedule/test">/schedule/test</a> ["androvalleyprince@gmail.com",
+    "rajxryn@gmail.com",
+    "abhiraj@workerai.co",
+    "anshuman@workerai.co",]</p>
     <p> Scheduled emails are sent every 10 minutes </p>
-    <p>View Pending Scheduled Emails in /schedule/view</p>
-    <p>Checkout Email Events in /updates</p>
+    <p>View Pending Scheduled Emails in <a href="/schedule/view">/schedule/view</a></p>
+    <p>Checkout Email Events in <a href="/updates">/updates</a></p>
     `);
 });
-
 app.get("/send-email", (req, res) => {
   const { email } = req.query;
   console.log(email);
