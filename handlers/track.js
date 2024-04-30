@@ -13,7 +13,7 @@ export async function trackOpens(req, res) {
   res.sendFile("transparent.gif", { root: "." });
 
   console.log("Tracking the email opening");
-  await db.tracker.create({
+  await db.tracker.upsert({
     data: {
       type: "OPEN",
       emailId: id,
@@ -133,7 +133,7 @@ async function findID(emailHtml) {
 async function logReplies(id) {
   console.log({ id });
 
-  await db.tracker.create({
+  await db.tracker.upsert({
     data: {
       type: "REPLY",
       emailId: id,
