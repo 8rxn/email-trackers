@@ -133,7 +133,10 @@ cron.schedule("*/10 * * * *", async () => {
       status: "PENDING",
     },
   });
-  emails.forEach(async (email) => {
-    await sendMail(email, oAuth2Client, true);
+  console.log(emails);
+  const emailPromise = emails.map(async (email) => {
+    return sendMail(email, oAuth2Client, true);
   });
+
+  await Promise.all(emailPromise);
 });
