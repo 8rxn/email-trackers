@@ -71,6 +71,7 @@ app.get("/", (req, res) => {
     <p>Send an email by sending a GET request to /send-email?email=<youremail></p>
     <p>Schedule an email by sending a GET request to /schedule?email=<youremail></p>
     <p>Add temp addreses by going to /schedule/test</p>
+    <p> Scheduled emails are sent every 10 minutes </p>
     <p>View Pending Scheduled Emails in /schedule/view</p>
     <p>Checkout Email Events in /updates</p>
     `);
