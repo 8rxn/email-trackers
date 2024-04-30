@@ -30,7 +30,7 @@ const url = oAuth2Client.generateAuthUrl({
   ],
 });
 
-console.log(url);
+url;
 
 async function startGmailWatch(authClient, userEmail) {
   const gmail = google.gmail({ version: "v1", auth: authClient });
@@ -124,7 +124,10 @@ app.listen(3000, () => {
 });
 
 cron.schedule("*/10 * * * *", async () => {
-  console.log("sending emails at ", new Date().toISOString());
+  console.log(
+    "Sending any pending Scheduled Emails At ",
+    new Date().toISOString()
+  );
   const emails = await db.scheduledEmails.findMany({
     where: {
       status: "PENDING",

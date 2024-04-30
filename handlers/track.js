@@ -12,14 +12,13 @@ export async function trackOpens(req, res) {
 
   res.sendFile("transparent.gif", { root: "." });
 
+  console.log("Tracking the email opening");
   await db.tracker.create({
     data: {
       type: "OPEN",
       emailId: id,
     },
   });
-
-  console.log("Tracking the email");
 }
 
 let processedHistoryIds = new Set();
@@ -38,12 +37,10 @@ export async function trackReplies(req, oAuth2Client) {
   console.log(typeof emailData);
   try {
     data = JSON.parse(emailData);
-    console.log("Email Address:", data.emailAddress);
-    console.log("History ID:", data.historyId);
   } catch (error) {
     console.error("Error parsing JSON:", error);
   }
-  console.log(processedHistoryIds, data.historyId);
+  // console.log(processedHistoryIds, data.historyId);
   if (processedHistoryIds.has(data.historyId)) {
     console.log("Duplicate message received, skipping processing.");
     return;
