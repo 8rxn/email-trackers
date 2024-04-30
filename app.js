@@ -134,6 +134,6 @@ cron.schedule("*/10 * * * *", async () => {
     },
   });
   emails.forEach(async (email) => {
-    await sendMail(email, oAuth2Client);
+    await sendMail(email, oAuth2Client, true);
   });
 });
