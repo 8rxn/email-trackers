@@ -1,4 +1,4 @@
-import db from "../lib/db";
+import db from "../lib/db.js";
 
 async function scheduleView(req, res) {
   const emails = await db.scheduledEmails.findMany({
