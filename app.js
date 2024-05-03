@@ -31,8 +31,6 @@ const url = oAuth2Client.generateAuthUrl({
   ],
 });
 
-url;
-
 async function startGmailWatch(authClient, userEmail) {
   const gmail = google.gmail({ version: "v1", auth: authClient });
 
@@ -54,6 +52,9 @@ async function startGmailWatch(authClient, userEmail) {
 
 startGmailWatch(oAuth2Client, "me");
 
+app.get("/login", async (req, res) => {
+  res.redirect(url);
+});
 app.get("/oauth2callback", async (req, res) => {
   const { code } = req.query;
   try {
